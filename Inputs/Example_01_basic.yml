@@ -1,0 +1,77 @@
+# LEAF-EB Example 01 - Basic deterministic electricity balance
+# Purpose: learn the minimum scenario structure before adding flexibility.
+# Historical data are synthetic and included with the repository.
+
+scenario:
+  folder: Outputs                  # All example results go here.
+  subfolder: Example_01_basic      # Separate folder for this example.
+  start_date: '2025-01-01'
+  end_date: '2026-12-31'
+
+historical_data:
+  file: Inputs/data/example_history_daily.csv
+  date_column: Date
+  processing_resolution: daily
+  unit: MWh                        # Unit used by every energy column.
+
+projection:
+  resolution: daily
+  variability:
+    enabled: false                 # Deterministic example: no MC residuals.
+  save_plots: false
+
+simulation:
+  resolution: daily
+  capacity_tolerance: "0 %"       # Do not exceed inferred source capacity.
+  console_output: standard
+
+demand:
+  target_production: "6000 MWh/day"
+  model: linear
+  balance: 1.0                     # No additional demand scaling.
+  values:
+    '2025-01-01': 0.98             # Fraction of the final target.
+    '2026-01-01': 1.00
+
+sources:
+  Solar:
+    share: 0.30                    # Final annual-generation share.
+    capacity_factor: 0.25
+    model: linear
+    values:
+      '2025-01-01': 0.98
+      '2026-01-01': 1.00
+
+  Wind:
+    share: 0.30
+    capacity_factor: 0.38
+    model: linear
+    values:
+      '2025-01-01': 0.98
+      '2026-01-01': 1.00
+
+  Hydro:
+    share: 0.25
+    capacity_factor: 0.50
+    model: linear
+    values:
+      '2025-01-01': 0.98
+      '2026-01-01': 1.00
+
+  Gas:
+    share: 0.15
+    capacity_factor: 0.50
+    model: linear
+    values:
+      '2025-01-01': 0.98
+      '2026-01-01': 1.00
+
+commodities_input:
+  # This activates the sequential electricity-balance calculation.
+  # No storage or commodity chain is added in this first example.
+  run_commodities: true
+
+output:
+  level: comparison                # Compact annual comparison outputs.
+  event_threshold: 1.0e-09
+  emissions: false

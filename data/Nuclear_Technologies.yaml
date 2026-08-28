@@ -1,0 +1,123 @@
+templates:
+  smr_300_reference:
+    description: Generic 300-MW unit derived from the NuScale VOYGR reference data. The scenario 
+      selects must-run or load-following operation.
+    references:
+    - OECD/NEA, Technical and Economic Aspects of Load Following with Nuclear Power Plants
+    - IAEA Nuclear Energy Series NP-T-3.23, Non-baseload Operation in Nuclear Power Plants
+    - IAEA-TECDOC-2110, Approaches to and Preparation for the Operation of Small Modular Reactors
+    - Argonne National Laboratory, Nuclear Waste Attributes, 2022
+    source:
+      emission_factor_co2: 12 gCO2e/kWh
+      model: custom
+      capacity_tolerance: 0 %
+      unit_capacity: "300 MW"
+      must_run:
+        power_fraction: 1.0
+      load_following:
+        energy_policy: follow_residual
+        control_mode: constrained_hourly
+        minimum_power_fraction: 0.5
+        maximum_power_fraction: 1.0
+        ramp_up_rate: 0.50 /h
+        ramp_down_rate: 0.25 /h
+        deep_reduction_threshold_fraction: 0.8
+        deep_reduction_request_duration: 2 h
+        max_deep_reduction_cycles: 2 /day
+      refueling:
+        operating_cycle: "24 month"
+        outage_duration: "30 day"
+        fuel_batches: 3
+        mode: offline
+        schedule: auto
+      fuel_cycle:
+        reference_design: NuScale_VOYGR_77MWe
+        reference_source: Argonne_ANL_Nuclear_Waste_Attributes_2022
+        reference_net_power: "77 MW"
+        reference_thermal_power: "250 MW"
+        reference_core_fuel_mass: "9.435 tHM"
+        reference_thermal_efficiency: 0.31
+        scaling_basis: constant_thermal_power_per_tHM
+        thermal_power: "967.741935483871 MW"
+        core_fuel_mass: "36.52258064516129 tHM"
+  smr_300_burnup60:
+    description: 300-MW SMR with refueling triggered by 60 GWd/tHM batch discharge burnup.
+    references:
+    - OECD/NEA, Technical and Economic Aspects of Load Following with Nuclear Power Plants
+    - IAEA Nuclear Energy Series NP-T-3.23, Non-baseload Operation in Nuclear Power Plants
+    - IAEA-TECDOC-2110, Approaches to and Preparation for the Operation of Small Modular Reactors
+    - Argonne National Laboratory, Nuclear Waste Attributes, 2022
+    source:
+      emission_factor_co2: 12 gCO2e/kWh
+      model: custom
+      capacity_tolerance: 0 %
+      unit_capacity: "300 MW"
+      must_run:
+        power_fraction: 1.0
+      load_following:
+        energy_policy: follow_residual
+        control_mode: constrained_hourly
+        minimum_power_fraction: 0.5
+        maximum_power_fraction: 1.0
+        ramp_up_rate: 0.50 /h
+        ramp_down_rate: 0.25 /h
+        deep_reduction_threshold_fraction: 0.8
+        deep_reduction_request_duration: 2 h
+        max_deep_reduction_cycles: 2 /day
+      refueling:
+        outage_duration: "30 day"
+        fuel_batches: 3
+        mode: offline
+        schedule: auto
+      fuel_cycle:
+        reference_design: NuScale_VOYGR_77MWe
+        reference_source: Argonne_ANL_Nuclear_Waste_Attributes_2022
+        reference_net_power: "77 MW"
+        reference_thermal_power: "250 MW"
+        reference_core_fuel_mass: "9.435 tHM"
+        reference_thermal_efficiency: 0.31
+        scaling_basis: constant_thermal_power_per_tHM
+        thermal_power: "967.741935483871 MW"
+        core_fuel_mass: "36.52258064516129 tHM"
+        target_burnup: "60 GWd/tHM"
+  smr_300_calendar60:
+    description: 300-MW SMR with fixed calendar matching the full-power 60 GWd/tHM refueling 
+      threshold.
+    references:
+    - OECD/NEA, Technical and Economic Aspects of Load Following with Nuclear Power Plants
+    - IAEA Nuclear Energy Series NP-T-3.23, Non-baseload Operation in Nuclear Power Plants
+    - IAEA-TECDOC-2110, Approaches to and Preparation for the Operation of Small Modular Reactors
+    - Argonne National Laboratory, Nuclear Waste Attributes, 2022
+    source:
+      emission_factor_co2: 12 gCO2e/kWh
+      model: custom
+      capacity_tolerance: 0 %
+      unit_capacity: "300 MW"
+      must_run:
+        power_fraction: 1.0
+      load_following:
+        energy_policy: follow_residual
+        control_mode: constrained_hourly
+        minimum_power_fraction: 0.5
+        maximum_power_fraction: 1.0
+        ramp_up_rate: 0.50 /h
+        ramp_down_rate: 0.25 /h
+        deep_reduction_threshold_fraction: 0.8
+        deep_reduction_request_duration: 2 h
+        max_deep_reduction_cycles: 2 /day
+      refueling:
+        operating_cycle: "24.7986403728 month"
+        outage_duration: "30 day"
+        fuel_batches: 3
+        mode: offline
+        schedule: auto
+      fuel_cycle:
+        reference_design: NuScale_VOYGR_77MWe
+        reference_source: Argonne_ANL_Nuclear_Waste_Attributes_2022
+        reference_net_power: "77 MW"
+        reference_thermal_power: "250 MW"
+        reference_core_fuel_mass: "9.435 tHM"
+        reference_thermal_efficiency: 0.31
+        scaling_basis: constant_thermal_power_per_tHM
+        thermal_power: "967.741935483871 MW"
+        core_fuel_mass: "36.52258064516129 tHM"

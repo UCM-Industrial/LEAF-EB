@@ -1,0 +1,186 @@
+# LEAF-EB commodity technology database
+# Rebuilt and re-referenced: 2026-08-24
+#
+# Numeric-list convention used by the code:
+#   [value]            fixed referenced scalar
+#   [min, mode, max]   triangular technology uncertainty
+#   [min, max]         legacy uniform range; retained for compatibility only
+#
+# Deterministic runs use the fixed value or triangular mode. Technology
+# distributions are sampled only when monte_carlo.technology_uncertainty=true.
+# Non-electric heat requirements are documented explicitly below but are not
+# added to the electricity balance.
+
+Commodity_Units:
+    CO2: kg
+    H2O: L
+    N2: kg
+    H2: kg
+    NH3: kg
+    CH4: kg
+
+Electricity_Consumption:
+    CO2:
+        # DAC electricity, diluted CO2 source: 1.44 MJ/kg CO2 = 0.400 kWh/kg.
+        DACG: [0.400]
+    H2O:
+        # MED electricity: 1.5-3.0 kWh/m3. No literature mode was identified,
+        # so the fixed midpoint is used: 2.25 kWh/m3 = 0.00225 kWh/L.
+        MED: [0.00225]
+    N2:
+        # N2-PSA: reported typical range 0.31-0.63 kWh/kg N2; 0.365 kWh/kg
+        # is a published design value at 8 bar and is used as the mode.
+        PSA: [0.310, 0.365, 0.630]
+    H2:
+        # Alkaline electrolysis. IRENA reports ~52 kWh/kg H2 as a central
+        # system value; commercial literature spans roughly 47-66 kWh/kg.
+        AE: [47.0, 52.0, 66.0]
+    NH3:
+        # Haber-Bosch/e-ammonia synthesis electricity: 2.16 MJ/kg NH3.
+        HB: [0.600]
+    CH4:
+        # Methanation electricity: 1.15 MJ/kg CH4 = 0.31944 kWh/kg.
+        M: [0.3194444444]
+
+# Physical inputs that require an auxiliary production technology. H2O values
+# are make-up water, not gross circulating water. For integrated e-methane,
+# water produced by methanation is credited internally, avoiding double count.
+Production_Inputs:
+    H2:
+        # Representative purified-water make-up for alkaline electrolysis.
+        H2O: [10.5]
+    NH3:
+        # Stoichiometric NH3 feed fractions; water follows H2 production.
+        H2O: [1.8648]
+        H2: [0.1776]
+        N2: [0.8224]
+    CH4:
+        # Integrated e-methane balance: 3.00 kg CO2 and 0.50 kg H2 feed.
+        # Net make-up water: 0.50*10.5 - 2.25 = 3.00 L/kg CH4 after
+        # crediting methanation water production to the electrolysis loop.
+        H2O: [3.00]
+        H2: [0.500]
+        CO2: [3.000]
+
+# Carbon bookkeeping is separated from process feed. Concawe reports 3.00 kg
+# CO2 feed and 0.25 kg CO2 synthesis emission per kg CH4, leaving 2.75 kg CO2
+# equivalent incorporated in the methane product.
+Carbon_Accounting:
+    CH4:
+        gross_co2_feed_kg_per_kg: 3.00
+        synthesis_co2_release_kg_per_kg: 0.25
+        co2_content_kg_per_kg: 2.75
+
+# These requirements are documented for boundary clarity. LEAF-EB currently
+# balances electricity only; these heat terms are not silently converted into
+# electricity. In the Concawe integrated e-methane pathway, process heat can
+# supply the DAC heat demand.
+Non_Electric_Energy:
+    CO2:
+        DACG_heat_kwh_th_per_kg: 1.600
+    H2O:
+        MED_heat_kwh_th_per_L: 0.1825
+
+Commodities_to_Electricity:
+    H2:
+        # PEM fuel-cell electrical efficiency and H2 LHV.
+        PEMFC:
+        - [0.500]
+        - [33.32]
+    NH3:
+        # Direct-ammonia SOFC electrical efficiency and NH3 LHV.
+        SOFC:
+        - [0.600]
+        - [5.19]
+    CH4:
+        # NETL F-class NGCC full-load net efficiency on an LHV basis and
+        # methane LHV. Part-load efficiency is not represented by this scalar.
+        CCGT:
+        - [0.585]
+        - [13.89]
+
+References:
+    CONCAWE_2022:
+        citation: >-
+            Concawe and Aramco (2022), E-Fuels: A techno-economic assessment
+            of European domestic production and imports towards 2050,
+            Report 17/22.
+        url: https://www.concawe.eu/wp-content/uploads/Rpt_22-17.pdf
+        used_for:
+        - DAC electricity and heat, Table 77
+        - methanation mass and energy balance, Table 2
+        - e-methane integrated mass balance, Figure 87
+        - H2, CH4 and NH3 lower heating values, Table 21
+    NREL_FTHENAKIS_2024:
+        citation: >-
+            Fthenakis et al. (2024), Renewable energy technologies for water
+            desalination, Progress in Energy 6, 032004.
+        url: https://www.nrel.gov/docs/fy24osti/88700.pdf
+        used_for:
+        - MED electric and thermal energy ranges, Table 1
+    IRENA_2022:
+        citation: >-
+            IRENA (2022), Renewable Technology Innovation Indicators:
+            Mapping progress in costs, patents and standards.
+        url: >-
+            https://www.irena.org/Publications/2022/Mar/Renewable-Technology-
+            Innovation-Indicators-Mapping-progress-in-costs-patents-and-standards
+        used_for:
+        - central alkaline-electrolyser electricity consumption
+    AWE_RANGE_2026:
+        citation: >-
+            High-current-density experimental operation and dynamic response
+            of a zero-gap alkaline water electrolysis stack at system level
+            (2026).
+        url: https://www.sciencedirect.com/science/article/pii/S0378775326012723
+        used_for:
+        - commercial alkaline-electrolysis electricity-consumption bounds
+    N2_PSA_LIU_2020:
+        citation: >-
+            Liu, Elgowainy and Wang (2020), Life cycle energy use and
+            greenhouse gas emissions of ammonia production from renewable
+            resources and industrial by-products, Green Chemistry 22,
+            5751-5761.
+        doi: 10.1039/D0GC02301A
+        used_for:
+        - N2-PSA central electricity value, 0.365 kWh/kg at 8 bar
+    N2_PSA_RANGE_2024:
+        citation: >-
+            Minimum work associated with separating nitrogen from air,
+            F1000Research 13:158 (2024).
+        url: https://f1000research.com/articles/13-158/v1
+        used_for:
+        - N2-PSA typical 0.31-0.63 kWh/kg range
+    NAYAK_LUKE_2018:
+        citation: >-
+            Nayak-Luke, Banares-Alcantara and Wilkinson (2018), Green Ammonia:
+            Impact of Renewable Energy Intermittency on Plant Sizing and
+            Levelized Cost of Ammonia, Ind. Eng. Chem. Res.
+        doi: 10.1021/acs.iecr.8b02447
+        used_for:
+        - PEMFC efficiency cross-check
+        - ammonia-system electricity cross-checks
+    LUO_2022:
+        citation: >-
+            Luo et al. (2022), Optimized coupling of ammonia decomposition and
+            electrochemical oxidation in a tubular direct ammonia SOFC,
+            Applied Energy 307, 118158.
+        doi: 10.1016/j.apenergy.2021.118158
+        used_for:
+        - direct-ammonia SOFC electrical efficiency
+    NETL_2023:
+        citation: >-
+            NETL, Cost and Performance Baseline for Fossil Energy Plants,
+            Volume 5: Natural Gas Electricity Generating Units for Flexible
+            Operation.
+        url: https://www.netl.doe.gov/projects/files/CostandPerformanceBaselineforFossilEnergyPlantsVol5NatGasElectricityGenUnitsFlexOperation_050523.pdf
+        used_for:
+        - CCGT full-load LHV net efficiency and part-load limitation
+    WATER_REVIEW_2026:
+        citation: >-
+            Sanchez et al. (2026), Water Consumption in Hydrogen Production
+            Through Electrolysis: Overview, State-of-the-Art, and Future Trends,
+            WIREs Energy and Environment.
+        doi: 10.1002/wene.70035
+        used_for:
+        - alkaline-electrolysis make-up water central value

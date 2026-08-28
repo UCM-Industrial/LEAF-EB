@@ -1,0 +1,87 @@
+# LEAF-EB Example 06 - Load-following nuclear operation
+# Uses the same 300-MW deployment as Example 05, but nuclear output follows
+# the residual electricity requirement and refueling is burnup-driven.
+
+scenario:
+  folder: Outputs
+  subfolder: Example_06_nuclear_load_following
+  start_date: '2025-01-01'
+  end_date: '2029-12-31'
+
+historical_data:
+  file: Inputs/data/example_history_hourly.csv
+  date_column: Date
+  processing_resolution: hourly
+  unit: MWh
+
+projection:
+  resolution: daily
+  variability:
+    enabled: false
+  save_plots: false
+
+simulation:
+  resolution: hourly
+  capacity_tolerance: "0 %"
+  console_output: standard
+
+demand:
+  target_production: "24000 MWh/day"
+  model: linear
+  balance: 1.0
+  values:
+    '2025-01-01': 0.96
+    '2029-01-01': 1.00
+
+sources:
+  Solar:
+    share: 0.30
+    capacity_factor: 0.20
+    model: linear
+    values:
+      '2025-01-01': 0.96
+      '2029-01-01': 1.00
+
+  Wind:
+    share: 0.25
+    capacity_factor: 0.38
+    model: linear
+    values:
+      '2025-01-01': 0.96
+      '2029-01-01': 1.00
+
+  Hydro:
+    share: 0.20
+    capacity_factor: 0.50
+    model: linear
+    values:
+      '2025-01-01': 0.96
+      '2029-01-01': 1.00
+
+  Gas:
+    share: 0.10
+    capacity_factor: 0.50
+    model: linear
+    hourly_operation: dispatchable
+    dispatch_priority: 1
+    values:
+      '2025-01-01': 0.96
+      '2029-01-01': 1.00
+
+  Nuclear_SMR300:
+    technology_template:
+      file: data/Nuclear_Technologies.yaml
+      name: smr_300_burnup60         # Refuel at 60 GWd/tHM batch burnup.
+    custom_mode: add
+    hourly_operation: load_following # Follow residual requirement hourly.
+    dispatch_priority: 1
+    capacity_additions:
+      '2025-01-01': "300 MW"
+
+commodities_input:
+  run_commodities: true
+
+output:
+  level: analysis
+  event_threshold: 1.0e-09
+  emissions: false

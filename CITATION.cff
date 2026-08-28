@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: >-
+  If you use LEAF-EB in research, please cite the software using this metadata.
+title: >-
+  LEAF-EB: Long-term Energy Analysis Framework - Electricity Balance
+type: software
+authors:
+  - family-names: Merino Rodríguez
+    given-names: Iván
+version: 2026.08.27
+date-released: 2026-08-27
+license: MIT
+abstract: >-
+  LEAF-EB constructs and evaluates long-term electricity scenarios from
+  user-defined or externally derived assumptions at daily or hourly resolution
+  while retaining temporal patterns relevant to storage, commodity conversion,
+  nuclear operation, refueling and Monte Carlo analysis.

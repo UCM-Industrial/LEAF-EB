@@ -1,0 +1,106 @@
+# LEAF-EB Example 04 - BESS plus synthetic methane storage
+# Uses the same hourly electricity case as Example 03. Surplus first charges
+# BESS, then produces CH4. Stored CH4 can later be converted to electricity.
+
+scenario:
+  folder: Outputs
+  subfolder: Example_04_commodities
+  start_date: '2025-01-01'
+  end_date: '2026-12-31'
+
+historical_data:
+  file: Inputs/data/example_history_hourly.csv
+  date_column: Date
+  processing_resolution: hourly
+  unit: MWh
+
+projection:
+  resolution: daily
+  variability:
+    enabled: false
+  save_plots: false
+
+simulation:
+  resolution: hourly
+  capacity_tolerance: "0 %"
+  console_output: standard
+  initial_conditions:
+    bess_state_of_charge: 0.0
+    commodity_inventory:
+      CH4: 0.0                      # Start with no stored methane.
+
+demand:
+  target_production: "24000 MWh/day"
+  model: linear
+  balance: 1.0
+  values:
+    '2025-01-01': 0.98
+    '2026-01-01': 1.00
+
+sources:
+  Solar:
+    share: 0.40
+    capacity_factor: 0.20
+    model: linear
+    values:
+      '2025-01-01': 0.98
+      '2026-01-01': 1.00
+
+  Wind:
+    share: 0.35
+    capacity_factor: 0.38
+    model: linear
+    values:
+      '2025-01-01': 0.98
+      '2026-01-01': 1.00
+
+  Hydro:
+    share: 0.25
+    capacity_factor: 0.50
+    model: linear
+    values:
+      '2025-01-01': 0.98
+      '2026-01-01': 1.00
+
+commodities_input:
+  run_commodities: true
+  database_path: data/Database.yaml
+
+  BESS:
+    Total:
+      model: constant
+      value: "150 MW"
+      duration: "4 h"
+      efficiency: 0.90
+
+  Commodities_Production:
+    CH4:
+      share: 1.0                   # All commodity production goes to CH4.
+      technology: M                # Methanation chain in Database.yaml.
+      inputs:
+        H2O: MED
+        H2: AE
+        CO2: DACG
+
+  Commodity_Storage:
+    CH4:
+      max_age: "20 year"
+      max_storage_quantity: 1000000000.0
+
+  Fuel_to_Electricity:
+    CH4:
+      share: 1.0
+      technology: CCGT
+
+  Dispatch_Order:
+    surplus:
+      - BESS
+      - Commodities_Production
+    deficit:
+      - BESS
+      - Fuel_to_Electricity
+
+output:
+  level: analysis
+  event_threshold: 1.0e-09
+  emissions: false

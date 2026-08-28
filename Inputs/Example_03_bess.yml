@@ -1,0 +1,80 @@
+# LEAF-EB Example 03 - Battery energy storage system (BESS)
+# Builds on the deterministic balance and moves to hourly operation so a
+# short-duration battery is represented at an appropriate time resolution.
+
+scenario:
+  folder: Outputs
+  subfolder: Example_03_bess
+  start_date: '2025-01-01'
+  end_date: '2026-12-31'
+
+historical_data:
+  file: Inputs/data/example_history_hourly.csv
+  date_column: Date
+  processing_resolution: hourly
+  unit: MWh
+
+projection:
+  resolution: daily                # Scenario assumptions remain daily.
+  variability:
+    enabled: false
+  save_plots: false
+
+simulation:
+  resolution: hourly               # BESS charge/discharge is hourly.
+  capacity_tolerance: "0 %"
+  console_output: standard
+  initial_conditions:
+    bess_state_of_charge: 0.0      # Start with an empty battery.
+
+demand:
+  target_production: "24000 MWh/day"
+  model: linear
+  balance: 1.0
+  values:
+    '2025-01-01': 0.98
+    '2026-01-01': 1.00
+
+sources:
+  Solar:
+    share: 0.40
+    capacity_factor: 0.20
+    model: linear
+    values:
+      '2025-01-01': 0.98
+      '2026-01-01': 1.00
+
+  Wind:
+    share: 0.35
+    capacity_factor: 0.38
+    model: linear
+    values:
+      '2025-01-01': 0.98
+      '2026-01-01': 1.00
+
+  Hydro:
+    share: 0.25
+    capacity_factor: 0.50
+    model: linear
+    values:
+      '2025-01-01': 0.98
+      '2026-01-01': 1.00
+
+commodities_input:
+  run_commodities: true
+  BESS:
+    Total:
+      model: constant
+      value: "150 MW"              # Installed battery power.
+      duration: "4 h"              # Energy capacity = 150 MW x 4 h.
+      efficiency: 0.90             # Round-trip efficiency.
+  Dispatch_Order:
+    surplus:
+      - BESS                       # Charge before leaving surplus unused.
+    deficit:
+      - BESS                       # Discharge before remaining requirement.
+
+output:
+  level: analysis                  # Adds storage operating summaries.
+  event_threshold: 1.0e-09
+  emissions: false

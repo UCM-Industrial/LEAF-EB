@@ -1,0 +1,86 @@
+# LEAF-EB Example 05 - Constant-output nuclear operation
+# A generic 300-MW SMR is added in 2025. It operates at full available power
+# and follows the fixed-calendar refueling schedule in the public template.
+
+scenario:
+  folder: Outputs
+  subfolder: Example_05_nuclear_constant
+  start_date: '2025-01-01'
+  end_date: '2029-12-31'
+
+historical_data:
+  file: Inputs/data/example_history_hourly.csv
+  date_column: Date
+  processing_resolution: hourly
+  unit: MWh
+
+projection:
+  resolution: daily                # Long-term scenario values are daily.
+  variability:
+    enabled: false
+  save_plots: false
+
+simulation:
+  resolution: hourly               # Nuclear operation is resolved hourly.
+  capacity_tolerance: "0 %"
+  console_output: standard
+
+demand:
+  target_production: "24000 MWh/day"
+  model: linear
+  balance: 1.0
+  values:
+    '2025-01-01': 0.96
+    '2029-01-01': 1.00
+
+sources:
+  Solar:
+    share: 0.30
+    capacity_factor: 0.20
+    model: linear
+    values:
+      '2025-01-01': 0.96
+      '2029-01-01': 1.00
+
+  Wind:
+    share: 0.25
+    capacity_factor: 0.38
+    model: linear
+    values:
+      '2025-01-01': 0.96
+      '2029-01-01': 1.00
+
+  Hydro:
+    share: 0.20
+    capacity_factor: 0.50
+    model: linear
+    values:
+      '2025-01-01': 0.96
+      '2029-01-01': 1.00
+
+  Gas:
+    share: 0.10
+    capacity_factor: 0.50
+    model: linear
+    hourly_operation: dispatchable # Uses available output only when needed.
+    dispatch_priority: 1
+    values:
+      '2025-01-01': 0.96
+      '2029-01-01': 1.00
+
+  Nuclear_SMR300:
+    technology_template:
+      file: data/Nuclear_Technologies.yaml
+      name: smr_300_calendar60       # Fixed-calendar refueling template.
+    custom_mode: add                # Nuclear is added to the scenario mix.
+    hourly_operation: must_run      # Full available power while online.
+    capacity_additions:
+      '2025-01-01': "300 MW"        # One generic 300-MW unit.
+
+commodities_input:
+  run_commodities: true             # Run the electricity-balance engine.
+
+output:
+  level: analysis                    # Includes nuclear operating summaries.
+  event_threshold: 1.0e-09
+  emissions: false
